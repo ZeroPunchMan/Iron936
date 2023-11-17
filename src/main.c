@@ -3,6 +3,7 @@
 #include "systime.h"
 #include "usart.h"
 #include "cl_log.h"
+#include "adc.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -20,10 +21,11 @@
  */
 int main(void)
 {
-
     SysTick_Config(32000);
     /* USART configuration */
     USART_Config();
+    ADC_Config();
+
 
     while (1)
     {

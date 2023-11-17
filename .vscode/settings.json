@@ -15,6 +15,10 @@
     "files.associations": {
         "systime.h": "c",
         "usart.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "main.h": "c",
+        "hk32f030xmf4p6_eval.h": "c",
+        "hk32f030m.h": "c",
+        "adc.h": "c"
     }
 }

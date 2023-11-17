@@ -52,7 +52,7 @@
           <OutputName>Project</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>0</CreateHexFile>
+          <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Listings\</ListingPath>
@@ -412,6 +412,11 @@
               <FileName>usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\adc.c</FilePath>
             </File>
           </Files>
         </Group>

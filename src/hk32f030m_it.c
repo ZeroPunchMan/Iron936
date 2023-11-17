@@ -22,6 +22,8 @@
 #include "hk32f030m_it.h"
 #include "systime.h"
 #include "usart.h"
+#include "adc.h"
+#include "cl_log.h"
 /** @addtogroup HK32F030M_StdPeriph_Examples
  * @{
  */
@@ -115,6 +117,28 @@ void USART1_IRQHandler(void)
             USART1->TDR = data;
         else
             USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+    }
+}
+
+void ADC1_IRQHandler(void)
+{
+    /* ADC1 convert counter variable */
+    static uint8_t count = 0;
+
+    /* ADC1 EOC interrupt */
+    if (ADC_GetITStatus(ADC1, ADC_IT_EOC) == SET)
+    {
+        ADC_ClearITPendingBit(ADC1, ADC_IT_EOC);
+        OnAdcChannDone(count);
+        count++;
+    }
+
+    /* ADC1 EOSEQ interrupt */
+    if (ADC_GetITStatus(ADC1, ADC_IT_EOSEQ) == SET)
+    {
+        ADC_ClearITPendingBit(ADC1, ADC_IT_EOSEQ);
+        count = 0;
+        OnAdcSeqDone();
     }
 }
 
