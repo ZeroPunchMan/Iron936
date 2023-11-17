@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "hk32f030m_it.h"
+#include "systime.h"
 /** @addtogroup HK32F030M_StdPeriph_Examples
   * @{
   */
@@ -88,6 +89,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
+  SysTimeInc(1);
 }
 
 /******************************************************************************/

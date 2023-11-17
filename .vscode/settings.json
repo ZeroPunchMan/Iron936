@@ -1,0 +1,15 @@
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "MDK-ARM": true,
+        "common/clib/.vscode": true,
+        "common/clib/mcu_testcase": true,
+        "common/clib/testcase": true,
+        "common/clib/Makefile": true,
+    }
+}

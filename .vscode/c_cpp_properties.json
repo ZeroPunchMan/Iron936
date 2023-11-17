@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "HK32F030MF4P6",
+                "HK32F030MXX",
+                "USE_HK32F030xMF4P6_EVAL",
+                "USE_DEFAULT_TIMEOUT_CALLBACK",
+                "uint32_t=unsigned int",
+                "int32_t=int",
+                "uint16_t=unsigned short",
+                "int16_t=short",
+                "uint8_t=unsigned char",
+                "int8_t=char"
+            ],
+            "windowsSdkVersion": "10.0.22000.0",
+            "compilerPath": "cl.exe",
+            "cStandard": "c99",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64"
+        }
+    ],
+    "version": 4
+}

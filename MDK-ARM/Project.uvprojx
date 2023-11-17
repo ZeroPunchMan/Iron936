@@ -10,7 +10,7 @@
       <TargetName>HK32F030MF4P6</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
+      <pCCUsed>5060960::V5.06 update 7 (build 960)::.\ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>HK32F030MF4P6,HK32F030MXX,USE_HK32F030xMF4P6_EVAL,USE_DEFAULT_TIMEOUT_CALLBACK</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Libraries\CMSIS\CM0\Core;..\Libraries\CMSIS\HK32F030M\Include;..\Libraries\CMSIS\HK32F030M\Source;..\Libraries\CMSIS\HK32F030M\Source\ARM;..\Libraries\HK32F030Mxx_StdPeriph_Driver\inc;..\Libraries\HK32F030Mxx_StdPeriph_Driver\src;..\inc;..\src;..\Boards\Board_HK32F030xMF4P6_EVAL\inc;..\Boards\Board_HK32F030xMF4P6_EVAL\src</IncludePath>
+              <IncludePath>..\Libraries\CMSIS\CM0\Core;..\Libraries\CMSIS\HK32F030M\Include;..\Libraries\CMSIS\HK32F030M\Source;..\Libraries\CMSIS\HK32F030M\Source\ARM;..\Libraries\HK32F030Mxx_StdPeriph_Driver\inc;..\Libraries\HK32F030Mxx_StdPeriph_Driver\src;..\inc;..\src;..\Boards\Board_HK32F030xMF4P6_EVAL\inc;..\Boards\Board_HK32F030xMF4P6_EVAL\src;..\common;..\common\clib\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -522,6 +522,51 @@
               <FileName>hk32f030xmf4p6_eval_spi_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Boards\Board_HK32F030xMF4P6_EVAL\src\hk32f030xmf4p6_eval_spi_flash.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>common</GroupName>
+          <Files>
+            <File>
+              <FileName>systime.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\systime.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>clib</GroupName>
+          <Files>
+            <File>
+              <FileName>cl_event_system.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\clib\src\cl_event_system.c</FilePath>
+            </File>
+            <File>
+              <FileName>cl_fsm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\clib\src\cl_fsm.c</FilePath>
+            </File>
+            <File>
+              <FileName>cl_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\clib\src\cl_list.c</FilePath>
+            </File>
+            <File>
+              <FileName>cl_pool.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\clib\src\cl_pool.c</FilePath>
+            </File>
+            <File>
+              <FileName>cl_queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\clib\src\cl_queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>cl_serialize.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\common\clib\src\cl_serialize.c</FilePath>
             </File>
           </Files>
         </Group>
