@@ -423,6 +423,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\tim.c</FilePath>
             </File>
+            <File>
+              <FileName>seg_dp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\seg_dp.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
