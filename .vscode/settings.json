@@ -11,5 +11,10 @@
         "common/clib/mcu_testcase": true,
         "common/clib/testcase": true,
         "common/clib/Makefile": true,
+    },
+    "files.associations": {
+        "systime.h": "c",
+        "usart.h": "c",
+        "stdio.h": "c"
     }
 }

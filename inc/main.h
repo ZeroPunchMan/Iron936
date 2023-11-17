@@ -29,15 +29,6 @@
 #include "hk32f030xmf4p6_eval.h"
 #endif /* USE_HK32F030xMF4P6_EVAL */
 
-/* Exported types ------------------------------------------------------------*/
-typedef struct 
-{
-  uint8_t Data[256];
-  uint8_t Len;
-  uint8_t Index;
-	uint8_t FinishedFlag;
-}USART_IT_TX_Def;
-
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
