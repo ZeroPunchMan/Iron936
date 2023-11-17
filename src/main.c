@@ -4,6 +4,7 @@
 #include "usart.h"
 #include "cl_log.h"
 #include "adc.h"
+#include "tim.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -25,7 +26,9 @@ int main(void)
     /* USART configuration */
     USART_Config();
     ADC_Config();
+    TIM_Config();
 
+    SetPwmDuty(PwmChan_Heater, 30);
     while (1)
     {
         static uint32_t lastTime = 0;

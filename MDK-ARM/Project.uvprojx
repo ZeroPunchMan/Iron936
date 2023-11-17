@@ -418,6 +418,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\adc.c</FilePath>
             </File>
+            <File>
+              <FileName>tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\tim.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -19,6 +19,7 @@
         "main.h": "c",
         "hk32f030xmf4p6_eval.h": "c",
         "hk32f030m.h": "c",
-        "adc.h": "c"
+        "adc.h": "c",
+        "tim.h": "c"
     }
 }
