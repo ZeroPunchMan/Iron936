@@ -24,6 +24,7 @@
 #include "usart.h"
 #include "adc.h"
 #include "cl_log.h"
+#include "seg_dp.h"
 /** @addtogroup HK32F030M_StdPeriph_Examples
  * @{
  */
@@ -92,6 +93,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
     SysTimeInc(1);
+    SegDp_Update();
 }
 
 /******************************************************************************/

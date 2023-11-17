@@ -26,3 +26,12 @@
 
 // #define SEG_DP_PORT (GPIOF)
 // #define SEG_DP_PIN (GPIO_Pin_5)
+
+#define SEG_SEL_1_PORT (GPIOC)
+#define SEG_SEL_1_PIN (GPIO_Pin_3)
+
+#define SEG_SEL_2_PORT (GPIOA)
+#define SEG_SEL_2_PIN (GPIO_Pin_1)
+
+#define SEG_SEL_3_PORT (GPIOD)
+#define SEG_SEL_3_PIN (GPIO_Pin_1)

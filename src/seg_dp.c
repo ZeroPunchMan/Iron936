@@ -1,11 +1,19 @@
 #include "seg_dp.h"
 #include "board.h"
 
+
+
 typedef struct
 {
     GPIO_TypeDef *port;
     uint32_t pin;
 } SegPin_t;
+
+static const SegPin_t segSelPins[3] = {
+    [0] = {.port = SEG_SEL_1_PORT, .pin = SEG_SEL_1_PIN},
+    [1] = {.port = SEG_SEL_2_PORT, .pin = SEG_SEL_2_PIN},
+    [2] = {.port = SEG_SEL_3_PORT, .pin = SEG_SEL_3_PIN},
+};
 
 static const SegPin_t segPins[7] = {
     [0] = {.port = SEG_F_PORT, .pin = SEG_F_PIN},
@@ -18,44 +26,59 @@ static const SegPin_t segPins[7] = {
     // [7] = {.port = SEG_DP_PORT, .pin = SEG_DP_PIN},
 };
 
-#define SEG_MASK(x) (1 << x)
+#define SEG_MASK_F (1 << 0)
+#define SEG_MASK_E (1 << 1)
+#define SEG_MASK_D (1 << 2)
+#define SEG_MASK_C (1 << 3)
+#define SEG_MASK_B (1 << 4)
+#define SEG_MASK_A (1 << 5)
+#define SEG_MASK_G (1 << 6)
 
 static const uint8_t segCharTable[SegDpChar_Max] = {
-    SEG_MASK(0) | SEG_MASK(1) | SEG_MASK(2) | SEG_MASK(3) | SEG_MASK(4) | SEG_MASK(5),
-    SEG_MASK(3) | SEG_MASK(4),
-    SEG_MASK(1) | SEG_MASK(2) | SEG_MASK(4) | SEG_MASK(5) | SEG_MASK(6),
-    SEG_MASK(2) | SEG_MASK(3) | SEG_MASK(4) | SEG_MASK(5) | SEG_MASK(6),
-    SEG_MASK(0) | SEG_MASK(3) | SEG_MASK(4) | SEG_MASK(6),
-    SEG_MASK(0) | SEG_MASK(2) | SEG_MASK(3) | SEG_MASK(5) | SEG_MASK(6),
+    SEG_MASK_F | SEG_MASK_E | SEG_MASK_D | SEG_MASK_C | SEG_MASK_B | SEG_MASK_A,              // 0
+    SEG_MASK_C | SEG_MASK_B,                                                                  // 1
+    SEG_MASK_E | SEG_MASK_D | SEG_MASK_B | SEG_MASK_A | SEG_MASK_G,                           // 2
+    SEG_MASK_D | SEG_MASK_C | SEG_MASK_B | SEG_MASK_A | SEG_MASK_G,                           // 3
+    SEG_MASK_F | SEG_MASK_C | SEG_MASK_B | SEG_MASK_G,                                        // 4
+    SEG_MASK_F | SEG_MASK_D | SEG_MASK_C | SEG_MASK_A | SEG_MASK_G,                           // 5
+    SEG_MASK_F | SEG_MASK_E | SEG_MASK_D | SEG_MASK_C | SEG_MASK_A | SEG_MASK_G,              // 6
+    SEG_MASK_A | SEG_MASK_B | SEG_MASK_C,                                                     // 7
+    SEG_MASK_F | SEG_MASK_E | SEG_MASK_D | SEG_MASK_C | SEG_MASK_B | SEG_MASK_A | SEG_MASK_G, // 8
+    SEG_MASK_F | SEG_MASK_D | SEG_MASK_C | SEG_MASK_B | SEG_MASK_A | SEG_MASK_G,              // 9
 };
 
-static inline void TurnOnSeg(uint8_t seg)
-{
-    GPIO_SetBits(segPins[seg].port, segPins[seg].pin);
-}
+static void SegDp_SetChar(SegDpChar_t c);
 
-static inline void TurnOffSeg(uint8_t seg)
+static inline void TurnOnSeg(uint8_t seg)
 {
     GPIO_ResetBits(segPins[seg].port, segPins[seg].pin);
 }
 
-void SegDp_Init(void)
+static inline void TurnOffSeg(uint8_t seg)
 {
-    GPIO_IOMUX_ChangePin(IOMUX_PIN5, IOMUX_PB5_SEL_PB5);
+    GPIO_SetBits(segPins[seg].port, segPins[seg].pin);
+}
 
-    GPIO_InitTypeDef GPIO_InitStructure;
-    for (int i = 0; i < CL_ARRAY_LENGTH(segPins); i++)
+static inline void SelectSeg(uint8_t offset)
+{
+    switch (offset)
     {
-        GPIO_InitStructure.GPIO_Pin = segPins[i].pin;
-        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-        GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
-        GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-        GPIO_Init(segPins[i].port, &GPIO_InitStructure);
-
-        GPIO_ResetBits(segPins[i].port, segPins[i].pin);
+    case 0:
+        GPIO_ResetBits(segSelPins[0].port, segSelPins[0].pin);
+        GPIO_SetBits(segSelPins[1].port, segSelPins[1].pin);
+        GPIO_SetBits(segSelPins[2].port, segSelPins[2].pin);
+        break;
+    case 1:
+        GPIO_SetBits(segSelPins[0].port, segSelPins[0].pin);
+        GPIO_ResetBits(segSelPins[1].port, segSelPins[1].pin);
+        GPIO_SetBits(segSelPins[2].port, segSelPins[2].pin);
+        break;
+    case 2:
+        GPIO_SetBits(segSelPins[0].port, segSelPins[0].pin);
+        GPIO_SetBits(segSelPins[1].port, segSelPins[1].pin);
+        GPIO_ResetBits(segSelPins[2].port, segSelPins[2].pin);
+        break;
     }
-    
 }
 
 void SegDp_SetChar(SegDpChar_t c)
@@ -70,21 +93,63 @@ void SegDp_SetChar(SegDpChar_t c)
     }
 }
 
-void SegDp_SetDp(bool dp)
+
+// void SegDp_SetBitMask(uint8_t mask)
+// {
+//     for (int i = 0; i < 8; i++)
+//     {
+//         if (mask & (1 << i))
+//             TurnOnSeg(i);
+//         else
+//             TurnOffSeg(i);
+//     }
+// }
+
+static uint8_t disNumber[3] = {0};
+void SegDp_SetNumber(uint8_t num1, uint8_t num2, uint8_t num3)
 {
-    if (dp)
-        TurnOnSeg(7);
-    else
-        TurnOffSeg(7);
+    disNumber[0] = num1 % 10;
+    disNumber[1] = num2 % 10;
+    disNumber[2] = num3 % 10;
 }
 
-void SegDp_SetBitMask(uint8_t mask)
+void SegDp_Init(void)
 {
-    for (int i = 0; i < 8; i++)
+    GPIO_IOMUX_ChangePin(IOMUX_PIN5, IOMUX_PB5_SEL_PB5);
+
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+
+    for (int i = 0; i < CL_ARRAY_LENGTH(segPins); i++)
     {
-        if (mask & (1 << i))
-            TurnOnSeg(i);
-        else
-            TurnOffSeg(i);
+        GPIO_InitStructure.GPIO_Pin = segPins[i].pin;
+        GPIO_Init(segPins[i].port, &GPIO_InitStructure);
+
+        GPIO_ResetBits(segPins[i].port, segPins[i].pin);
     }
+
+    for (int i = 0; i < CL_ARRAY_LENGTH(segSelPins); i++)
+    {
+        GPIO_InitStructure.GPIO_Pin = segSelPins[i].pin;
+        GPIO_Init(segSelPins[i].port, &GPIO_InitStructure);
+
+        GPIO_ResetBits(segSelPins[i].port, segSelPins[i].pin);
+    }
+}
+
+
+
+void SegDp_Update(void)
+{
+    static uint8_t count = 0;
+    count++;
+    if (count >= 3)
+        count = 0;
+
+    SelectSeg(count);
+    SegDp_SetChar((SegDpChar_t)disNumber[count]);
 }
