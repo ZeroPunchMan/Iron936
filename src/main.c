@@ -5,6 +5,7 @@
 #include "cl_log.h"
 #include "adc.h"
 #include "tim.h"
+#include "seg_dp.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -27,7 +28,7 @@ int main(void)
     USART_Config();
     ADC_Config();
     TIM_Config();
-
+    SegDp_Init();
     SetPwmDuty(PwmChan_Heater, 30);
     while (1)
     {
