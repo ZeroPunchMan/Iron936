@@ -26,14 +26,16 @@ int main(void)
     USART_Config();
     ADC_Config();
 
-
     while (1)
     {
         static uint32_t lastTime = 0;
         if (SysTimeSpan(lastTime) >= SYSTIME_SECOND(1))
         {
             lastTime = GetSysTime();
-            CL_LOG_LINE("%ds", GetSysTime() / 1000);
+            // CL_LOG_LINE("%ds", GetSysTime() / 1000);
+
+            AdcConvert();
+            CL_LOG_LINE("adc: %d, %d, %d", GetAdcResult(0), GetAdcResult(1), GetAdcResult(2));
         }
     }
 }

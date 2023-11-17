@@ -51,7 +51,7 @@ void USART_Config(void)
 
     /* Configre NVIC */
     NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelPriority = 2;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 

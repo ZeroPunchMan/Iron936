@@ -120,28 +120,6 @@ void USART1_IRQHandler(void)
     }
 }
 
-void ADC1_IRQHandler(void)
-{
-    /* ADC1 convert counter variable */
-    static uint8_t count = 0;
-
-    /* ADC1 EOC interrupt */
-    if (ADC_GetITStatus(ADC1, ADC_IT_EOC) == SET)
-    {
-        ADC_ClearITPendingBit(ADC1, ADC_IT_EOC);
-        OnAdcChannDone(count);
-        count++;
-    }
-
-    /* ADC1 EOSEQ interrupt */
-    if (ADC_GetITStatus(ADC1, ADC_IT_EOSEQ) == SET)
-    {
-        ADC_ClearITPendingBit(ADC1, ADC_IT_EOSEQ);
-        count = 0;
-        OnAdcSeqDone();
-    }
-}
-
 /**
  * @brief  This function handles PPP interrupt request.
  * @param  None

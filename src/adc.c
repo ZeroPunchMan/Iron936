@@ -8,16 +8,15 @@ void ADC_Config(void)
 {
     ADC_InitTypeDef ADC_InitStructure;
     GPIO_InitTypeDef GPIO_InitStructure;
-    NVIC_InitTypeDef NVIC_InitStructure;
 
     /* GPIO Periph clock enable */
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD, ENABLE);
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
 
     /* ADC1 Periph clock enable */
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC, ENABLE);
 
-    /* Configure ADC1 Channel2,Channel3 and Channel4 as analog input */
+    /* Configure Channel4 as analog input */
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
@@ -28,11 +27,6 @@ void ADC_Config(void)
 
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
     GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-    NVIC_InitStructure.NVIC_IRQChannel = ADC1_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
 
     /* ADC1 DeInit */
     ADC_DeInit(ADC1);
@@ -47,13 +41,7 @@ void ADC_Config(void)
     ADC_InitStructure.ADC_ScanDirection = ADC_ScanDirection_Upward;
     ADC_Init(ADC1, &ADC_InitStructure);
 
-    /* Enable ADC1 end of convert end interrupt	*/
-    ADC_ITConfig(ADC1, ADC_IT_EOC, ENABLE);
-
-    /* Enable sequence convert end interrupt */
-    ADC_ITConfig(ADC1, ADC_IT_EOSEQ, ENABLE);
-
-    /* Convert the ADC1 Channel2, Channel3 and Channel4 with 239.5 Cycles as sampling time */
+    /* Convert the ADC1 Channel4 with 239.5 Cycles as sampling time */
     ADC_ChannelConfig(ADC1, ADC_Channel_2 | ADC_Channel_3 | ADC_Channel_4, ADC_SampleTime_239_5Cycles);
 
     /* ADC1 Calibration */
@@ -67,30 +55,17 @@ void ADC_Config(void)
         ;
 }
 
-static volatile bool adcSeqDone = true;
-static volatile uint16_t adcResult[3] = {0};
-void OnAdcChannDone(uint8_t channel)
+static uint16_t adcResult[3] = {0};
+void AdcConvert(void)
 {
-    adcResult[channel] = ADC_GetConversionValue(ADC1);
-}
-
-void OnAdcSeqDone(void)
-{
-    adcSeqDone = true;
-}
-
-void StartAdcOneSeq(void)
-{
-    if (adcSeqDone == true)
+    for (int i = 0; i < 3; i++)
     {
-        adcSeqDone = false;
         ADC_StartOfConversion(ADC1);
-    }
-}
+        while (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET)
+            ;
 
-bool IsAdcConvDone(void)
-{
-    return adcSeqDone;
+        adcResult[i] = ADC_GetConversionValue(ADC1);
+    }
 }
 
 uint16_t GetAdcResult(uint8_t channel)
