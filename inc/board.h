@@ -35,3 +35,10 @@
 
 #define SEG_SEL_3_PORT (GPIOD)
 #define SEG_SEL_3_PIN (GPIO_Pin_1)
+
+
+/**************************
+ * 休眠端口配置
+ *************************/
+#define SLEEP_PORT (GPIOD)
+#define SLEEP_PIN (GPIO_Pin_5)

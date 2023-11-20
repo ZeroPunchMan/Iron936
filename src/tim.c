@@ -49,6 +49,8 @@ void TIM_Config(void)
 
     /* TIM1 Main Output Enable */
     TIM_CtrlPWMOutputs(TIM1, ENABLE);
+
+    SetPwmDuty(PwmChan_Heater, 0);
 }
 
 void SetPwmDuty(PwmChannel_t chann, uint8_t duty)

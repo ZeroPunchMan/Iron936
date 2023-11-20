@@ -25,6 +25,7 @@
 #include "adc.h"
 #include "cl_log.h"
 #include "seg_dp.h"
+#include "heater.h"
 /** @addtogroup HK32F030M_StdPeriph_Examples
  * @{
  */
@@ -94,6 +95,7 @@ void SysTick_Handler(void)
 {
     SysTimeInc(1);
     SegDp_Update();
+    Heater_Update();
 }
 
 /******************************************************************************/

@@ -428,6 +428,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\seg_dp.c</FilePath>
             </File>
+            <File>
+              <FileName>heater.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\heater.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

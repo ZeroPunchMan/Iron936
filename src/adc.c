@@ -3,6 +3,7 @@
 #include "systime.h"
 #include "cl_log.h"
 #include "usart.h"
+#include "adc.h"
 
 void ADC_Config(void)
 {
@@ -64,7 +65,7 @@ void AdcConvert(void)
     }
 }
 
-uint16_t GetAdcResult(uint8_t channel)
+uint16_t GetAdcResult(AdcChannel_t channel)
 {
     return adcResult[channel];
 }

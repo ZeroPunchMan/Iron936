@@ -6,6 +6,7 @@
 #include "adc.h"
 #include "tim.h"
 #include "seg_dp.h"
+#include "heater.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -30,7 +31,8 @@ int main(void)
     ADC_Config();
     TIM_Config();
     SegDp_Init();
-    SetPwmDuty(PwmChan_Heater, 30);
+    Heater_Init();
+
     while (1)
     {
         static uint32_t lastTime = 0;
@@ -39,8 +41,8 @@ int main(void)
             lastTime = GetSysTime();
             // CL_LOG_LINE("%ds", GetSysTime() / 1000);
 
-            AdcConvert();
-            CL_LOG_LINE("adc: %d, %d, %d", GetAdcResult(0), GetAdcResult(1), GetAdcResult(2));
+            // AdcConvert();
+            // CL_LOG_LINE("adc: %d, %d, %d", GetAdcResult(0), GetAdcResult(1), GetAdcResult(2));
         }
     }
 }
