@@ -9,10 +9,6 @@ void ADC_Config(void)
     ADC_InitTypeDef ADC_InitStructure;
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    /* GPIO Periph clock enable */
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOD, ENABLE);
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
-
     /* ADC1 Periph clock enable */
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC, ENABLE);
 

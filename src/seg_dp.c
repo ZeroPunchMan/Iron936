@@ -1,8 +1,6 @@
 #include "seg_dp.h"
 #include "board.h"
 
-
-
 typedef struct
 {
     GPIO_TypeDef *port;
@@ -45,6 +43,7 @@ static const uint8_t segCharTable[SegDpChar_Max] = {
     SEG_MASK_A | SEG_MASK_B | SEG_MASK_C,                                                     // 7
     SEG_MASK_F | SEG_MASK_E | SEG_MASK_D | SEG_MASK_C | SEG_MASK_B | SEG_MASK_A | SEG_MASK_G, // 8
     SEG_MASK_F | SEG_MASK_D | SEG_MASK_C | SEG_MASK_B | SEG_MASK_A | SEG_MASK_G,              // 9
+    0,              // off
 };
 
 static void SegDp_SetChar(SegDpChar_t c);
@@ -93,7 +92,6 @@ void SegDp_SetChar(SegDpChar_t c)
     }
 }
 
-
 // void SegDp_SetBitMask(uint8_t mask)
 // {
 //     for (int i = 0; i < 8; i++)
@@ -115,7 +113,6 @@ void SegDp_SetNumber(uint8_t num1, uint8_t num2, uint8_t num3)
 
 void SegDp_Init(void)
 {
-    GPIO_IOMUX_ChangePin(IOMUX_PIN5, IOMUX_PB5_SEL_PB5);
 
     GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -139,9 +136,10 @@ void SegDp_Init(void)
 
         GPIO_ResetBits(segSelPins[i].port, segSelPins[i].pin);
     }
+    GPIO_IOMUX_ChangePin(IOMUX_PIN11, IOMUX_PB5_SEL_PB5);
+
+    // SegDp_SetNumber(7, 8, 9);
 }
-
-
 
 void SegDp_Update(void)
 {
@@ -150,6 +148,7 @@ void SegDp_Update(void)
     if (count >= 3)
         count = 0;
 
+    SegDp_SetChar(SegDpChar_Off);
     SelectSeg(count);
     SegDp_SetChar((SegDpChar_t)disNumber[count]);
 }

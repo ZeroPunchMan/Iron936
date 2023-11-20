@@ -14,6 +14,7 @@ typedef enum
     SegDpChar_7,
     SegDpChar_8,
     SegDpChar_9,
+    SegDpChar_Off,
     SegDpChar_Max,
 } SegDpChar_t;
 

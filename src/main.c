@@ -24,7 +24,8 @@
 int main(void)
 {
     SysTick_Config(32000);
-    /* USART configuration */
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA | RCC_AHBPeriph_GPIOB | RCC_AHBPeriph_GPIOC | RCC_AHBPeriph_GPIOD, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_IOMUX, ENABLE);
     USART_Config();
     ADC_Config();
     TIM_Config();

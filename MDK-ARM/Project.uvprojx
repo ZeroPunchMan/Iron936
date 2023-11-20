@@ -337,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>HK32F030MF4P6,HK32F030MXX,USE_HK32F030xMF4P6_EVAL,USE_DEFAULT_TIMEOUT_CALLBACK</Define>
+              <Define>HK32F030MF4P6,HK32F030MXX</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Libraries\CMSIS\CM0\Core;..\Libraries\CMSIS\HK32F030M\Include;..\Libraries\CMSIS\HK32F030M\Source;..\Libraries\CMSIS\HK32F030M\Source\ARM;..\Libraries\HK32F030Mxx_StdPeriph_Driver\inc;..\Libraries\HK32F030Mxx_StdPeriph_Driver\src;..\inc;..\src;..\Boards\Board_HK32F030xMF4P6_EVAL\inc;..\Boards\Board_HK32F030xMF4P6_EVAL\src;..\common;..\common\clib\inc</IncludePath>
+              <IncludePath>..\Libraries\CMSIS\CM0\Core;..\Libraries\CMSIS\HK32F030M\Include;..\Libraries\CMSIS\HK32F030M\Source;..\Libraries\CMSIS\HK32F030M\Source\ARM;..\Libraries\HK32F030Mxx_StdPeriph_Driver\inc;..\Libraries\HK32F030Mxx_StdPeriph_Driver\src;..\inc;..\src;..\common;..\common\clib\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -527,23 +527,6 @@
         </Group>
         <Group>
           <GroupName>Board</GroupName>
-          <Files>
-            <File>
-              <FileName>hk32f030xmf4p6_eval.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Boards\Board_HK32F030xMF4P6_EVAL\src\hk32f030xmf4p6_eval.c</FilePath>
-            </File>
-            <File>
-              <FileName>hk32f030xmf4p6_eval_i2c_ee.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Boards\Board_HK32F030xMF4P6_EVAL\src\hk32f030xmf4p6_eval_i2c_ee.c</FilePath>
-            </File>
-            <File>
-              <FileName>hk32f030xmf4p6_eval_spi_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Boards\Board_HK32F030xMF4P6_EVAL\src\hk32f030xmf4p6_eval_spi_flash.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>common</GroupName>
