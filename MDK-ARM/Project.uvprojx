@@ -433,6 +433,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\heater.c</FilePath>
             </File>
+            <File>
+              <FileName>pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\pid.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -529,9 +534,6 @@
               <FilePath>..\Libraries\HK32F030Mxx_StdPeriph_Driver\src\hk32f030m_wwdg.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>Board</GroupName>
         </Group>
         <Group>
           <GroupName>common</GroupName>

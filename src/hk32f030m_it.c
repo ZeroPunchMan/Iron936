@@ -95,7 +95,6 @@ void SysTick_Handler(void)
 {
     SysTimeInc(1);
     SegDp_Update();
-    Heater_Update();
 }
 
 /******************************************************************************/

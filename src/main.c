@@ -44,6 +44,7 @@ int main(void)
             // AdcConvert();
             // CL_LOG_LINE("adc: %d, %d, %d", GetAdcResult(0), GetAdcResult(1), GetAdcResult(2));
         }
+        Heater_Process();
     }
 }
 
