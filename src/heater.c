@@ -74,15 +74,6 @@ static void IdleProc(void)
     }
 }
 
-static void MeasureDelay(int x)
-{
-    while (x--)
-    {
-        for (int i = 0; i < 1000; i++)
-            ;
-    }
-}
-
 static inline uint16_t GetTargetTemp(uint16_t adc)
 {
     return adc; //todo
@@ -95,9 +86,6 @@ static inline uint16_t GetSensorTemp(uint16_t adc)
 
 static void ToMeasure(void)
 {
-    SetPwmDuty(PwmChan_Heater, 0);
-    MeasureDelay(100);
-
     uint16_t sensorAdc = 0;
     uint16_t tarTempAdc = 0;
     for (int i = 0; i < 10; i++)
