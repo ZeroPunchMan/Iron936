@@ -5,6 +5,7 @@
 #include "systime.h"
 #include "tim.h"
 #include "pid.h"
+#include "helper.h"
 
 typedef enum
 {
@@ -74,16 +75,6 @@ static void IdleProc(void)
     }
 }
 
-static inline uint16_t GetTargetTemp(uint16_t adc)
-{
-    return adc; //todo
-}
-
-static inline uint16_t GetSensorTemp(uint16_t adc)
-{
-    return adc; //todo
-}
-
 static void ToMeasure(void)
 {
     uint16_t sensorAdc = 0;
@@ -100,7 +91,9 @@ static void ToMeasure(void)
     if (context.onOff)
     {
         // pid
-        PIDController_Update(&pid, GetTargetTemp(tarTempAdc), GetSensorTemp(sensorAdc));
+        uint16_t tarTemp = GetTargetTemp(tarTempAdc);
+        uint16_t sensorTemp = GetSensorTemp(sensorAdc);
+        PIDController_Update(&pid, tarTemp, sensorTemp);
         ToHeat(pid.out);
     }
     else
