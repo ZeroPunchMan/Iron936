@@ -21,6 +21,7 @@
         "hk32f030m.h": "c",
         "adc.h": "c",
         "tim.h": "c",
-        "board.h": "c"
+        "board.h": "c",
+        "helper.h": "c"
     }
 }
