@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Text;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,6 +26,8 @@ public class MainPage : MonoBehaviour
     Text textLog = null;
 
     SerialPort serialPort = null;
+    //ConcurrentQueue<byte[]> recvQueue = new ConcurrentQueue<byte[]>();
+
 
     bool portOpened
     {
@@ -53,6 +57,21 @@ public class MainPage : MonoBehaviour
             btnOpenPort.transform.Find("Text").GetComponent<Text>().text = "打开串口";
             ClosePort();
         }
+
+        if (portOpened)
+        {
+            if (serialPort.BytesToRead > 0)
+            {
+                byte[] data = new byte[serialPort.BytesToRead];
+                serialPort.Read(data, 0, data.Length);
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in data)
+                {
+                    sb.AppendFormat("{0:x2} ", b);
+                }
+                Debug.Log(sb.ToString());
+            }
+        }
     }
 
     void OnCloseClick()
@@ -77,9 +96,10 @@ public class MainPage : MonoBehaviour
         serialPort.DataBits = 8;
         //设置停止位
         serialPort.StopBits = StopBits.One;
+        serialPort.ReadTimeout = 0;
 
         //接收数据回调
-        serialPort.DataReceived += this.OnReceivedData;
+        //serialPort.DataReceived += this.OnReceivedData;
         //回调阈值设置为1
         //serialPort.ReceivedBytesThreshold = 1;
 
@@ -105,14 +125,15 @@ public class MainPage : MonoBehaviour
         }
     }
 
-    void OnReceivedData(object sender, SerialDataReceivedEventArgs e)
-    {
-        byte[] data = new byte[serialPort.BytesToRead];
-        serialPort.Read(data, 0, data.Length);//读取数据
+    //void OnReceivedData(object sender, SerialDataReceivedEventArgs e)
+    //{
+    //    byte[] data = new byte[serialPort.BytesToRead];
+    //    serialPort.Read(data, 0, data.Length);//读取数据
 
-        //todo
-        //this.BeginInvoke(new AppendNewReceivedData(AppendRecvData), data);
-    }
+    //    recvQueue.Enqueue(data);
+    //    //todo
+    //    //this.BeginInvoke(new AppendNewReceivedData(AppendRecvData), data);
+    //}
 
     void OnOpenPortClick()
     {
@@ -121,6 +142,7 @@ public class MainPage : MonoBehaviour
         { //关闭串口
             ClosePort();
             btnOpenPort.transform.Find("Text").GetComponent<Text>().text = "打开串口";
+            PrintLog("关闭串口");
         }
         else
         { //打开串口
