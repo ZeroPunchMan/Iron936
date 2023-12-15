@@ -6,6 +6,7 @@
 #include "tim.h"
 #include "pid.h"
 #include "helper.h"
+#include "cl_log.h"
 
 typedef enum
 {
@@ -23,14 +24,14 @@ typedef struct
 
 static WorkContext_t context = {
     .workSta = WS_Idle,
-    .onOff = false,
+    .onOff = true,
     .startHeatTime = 0,
 };
 
 static PIDController pid = {
     .Kp = 1.0f,
     .Ki = 1.0f,
-    .Kd =1.0f,
+    .Kd = 1.0f,
 
     .limMinInt = -10.0f,
     .limMaxInt = 10.0f,
@@ -64,6 +65,7 @@ void Heater_Init(void)
 
 static void ToIdle(void)
 {
+    context.workSta = WS_Idle;
     SetPwmDuty(PwmChan_Heater, 0);
 }
 
@@ -77,6 +79,7 @@ static void IdleProc(void)
 
 static void ToMeasure(void)
 {
+    context.workSta = WS_Measure;
     uint16_t sensorAdc = 0;
     uint16_t tarTempAdc = 0;
     for (int i = 0; i < 10; i++)
@@ -87,6 +90,8 @@ static void ToMeasure(void)
     }
     sensorAdc /= 10;
     tarTempAdc /= 10;
+
+    // CL_LOG_LINE("tar: %d, sendor: %d", tarTempAdc, sensorAdc);
 
     if (context.onOff)
     {
@@ -104,7 +109,9 @@ static void ToMeasure(void)
 
 static void ToHeat(uint8_t pwmDuty)
 {
-    SetPwmDuty(PwmChan_Heater, pwmDuty);
+    context.workSta = WS_Heat;
+    // SetPwmDuty(PwmChan_Heater, pwmDuty);//todo
+    SetPwmDuty(PwmChan_Heater, 5);
     context.startHeatTime = GetSysTime();
 }
 

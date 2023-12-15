@@ -42,7 +42,7 @@ int main(void)
             // CL_LOG_LINE("%ds", GetSysTime() / 1000);
 
             // AdcConvert();
-            // CL_LOG_LINE("adc: %d, %d, %d", GetAdcResult(0), GetAdcResult(1), GetAdcResult(2));
+            CL_LOG_LINE("adc: %d, %d, %d", GetAdcResult(0), GetAdcResult(1), GetAdcResult(2));
         }
         Heater_Process();
     }
