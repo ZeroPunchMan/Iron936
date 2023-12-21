@@ -7,6 +7,7 @@
 #include "pid.h"
 #include "helper.h"
 #include "cl_log.h"
+#include "seg_dp.h"
 
 typedef enum
 {
@@ -42,7 +43,7 @@ static PIDController pid = {
     .T = 0.1f,
 };
 
-static void ToHeat(uint8_t pwmDuty);
+static void ToHeat(uint16_t pwmDuty);
 static void ToMeasure(void);
 
 void Heater_Init(void)
@@ -87,17 +88,25 @@ static void ToMeasure(void)
         AdcConvert();
         sensorAdc += GetAdcResult(AdcChann_Heater);
         tarTempAdc += GetAdcResult(AdcChann_TargetTemp);
+        DelayOnSysTime(1);
     }
     sensorAdc /= 10;
     tarTempAdc /= 10;
 
-    // CL_LOG_LINE("tar: %d, sendor: %d", tarTempAdc, sensorAdc);
+    static uint32_t lastMeasureTime = 0;
+    uint32_t span = SysTimeSpan(lastMeasureTime);
+    lastMeasureTime = GetSysTime();
+    pid.T = span / 1000.0f;
+
+    CL_LOG_LINE("tar: %d, sensor: %d", tarTempAdc, sensorAdc);
 
     if (context.onOff)
     {
         // pid
         uint16_t tarTemp = GetTargetTemp(tarTempAdc);
         uint16_t sensorTemp = GetSensorTemp(sensorAdc);
+        CL_LOG_LINE("temp: %d, %d", tarTemp, sensorTemp);
+        SegDp_SetNumber(tarTemp);
         PIDController_Update(&pid, tarTemp, sensorTemp);
         ToHeat(pid.out);
     }
@@ -107,11 +116,11 @@ static void ToMeasure(void)
     }
 }
 
-static void ToHeat(uint8_t pwmDuty)
+static void ToHeat(uint16_t pwmDuty)
 {
     context.workSta = WS_Heat;
     // SetPwmDuty(PwmChan_Heater, pwmDuty);//todo
-    SetPwmDuty(PwmChan_Heater, 5);
+    SetPwmDuty(PwmChan_Heater, 500);
     context.startHeatTime = GetSysTime();
 }
 

@@ -20,7 +20,7 @@ typedef enum
 
 void SegDp_Init(void);
 
-void SegDp_SetNumber(uint8_t num1, uint8_t num2, uint8_t num3);
+void SegDp_SetNumber(uint16_t num);
 
 // void SegDp_SetChar(SegDpChar_t c);
 // void SegDp_SetDp(bool dp);

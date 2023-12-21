@@ -90,9 +90,9 @@ uint16_t GetAdcResult(AdcChannel_t channel)
     case AdcChann_Heater:
         return ADC_Channel2_ConvertedValue;
     case AdcChann_SleepDelay:
-        return ADC_Channel3_ConvertedValue;
-    case AdcChann_TargetTemp:
         return ADC_Channel4_ConvertedValue;
+    case AdcChann_TargetTemp:
+        return ADC_Channel3_ConvertedValue;
     }
     return 0;
 }

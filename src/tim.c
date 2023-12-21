@@ -27,7 +27,7 @@ void TIM_Config(void)
     /* Time Base configuration */
     TIM_TimeBaseStructure.TIM_Prescaler = 320-1;
     TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseStructure.TIM_Period = 99;
+    TIM_TimeBaseStructure.TIM_Period = 999;
     TIM_TimeBaseStructure.TIM_ClockDivision = 0;
     TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
 
@@ -53,7 +53,7 @@ void TIM_Config(void)
     SetPwmDuty(PwmChan_Heater, 0);
 }
 
-void SetPwmDuty(PwmChannel_t chann, uint8_t duty)
+void SetPwmDuty(PwmChannel_t chann, uint16_t duty)
 {
     if(chann == PwmChan_Heater)
     {

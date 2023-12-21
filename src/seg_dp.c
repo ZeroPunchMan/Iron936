@@ -1,5 +1,6 @@
 #include "seg_dp.h"
 #include "board.h"
+#include "cl_log.h"
 
 typedef struct
 {
@@ -43,7 +44,7 @@ static const uint8_t segCharTable[SegDpChar_Max] = {
     SEG_MASK_A | SEG_MASK_B | SEG_MASK_C,                                                     // 7
     SEG_MASK_F | SEG_MASK_E | SEG_MASK_D | SEG_MASK_C | SEG_MASK_B | SEG_MASK_A | SEG_MASK_G, // 8
     SEG_MASK_F | SEG_MASK_D | SEG_MASK_C | SEG_MASK_B | SEG_MASK_A | SEG_MASK_G,              // 9
-    0,              // off
+    0,                                                                                        // off
 };
 
 static void SegDp_SetChar(SegDpChar_t c);
@@ -104,11 +105,12 @@ void SegDp_SetChar(SegDpChar_t c)
 // }
 
 static uint8_t disNumber[3] = {0};
-void SegDp_SetNumber(uint8_t num1, uint8_t num2, uint8_t num3)
+void SegDp_SetNumber(uint16_t num)
 {
-    disNumber[0] = num1 % 10;
-    disNumber[1] = num2 % 10;
-    disNumber[2] = num3 % 10;
+    disNumber[0] = (num % 1000) / 100;
+    disNumber[1] = (num % 100) / 10;
+    disNumber[2] = (num % 10);
+    CL_LOG_LINE("seg: %d, %d, %d", disNumber[2], disNumber[1], disNumber[0]);
 }
 
 void SegDp_Init(void)
@@ -138,7 +140,7 @@ void SegDp_Init(void)
     }
     GPIO_IOMUX_ChangePin(IOMUX_PIN11, IOMUX_PB5_SEL_PB5);
 
-    // SegDp_SetNumber(7, 8, 9);
+    // SegDp_SetNumber(789);
 }
 
 void SegDp_Update(void)
