@@ -26,7 +26,7 @@ static uint16_t TempInterpolate(const Adc2Temp_t *table, uint16_t tabLen, uint16
         }
     }
 
-    return 0xfffd;
+    return 0xfffd; //error
 }
 
 #define TAR_ADC_TO_R(adc) (adc * 1000UL / (4096UL - adc))

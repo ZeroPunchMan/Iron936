@@ -107,9 +107,17 @@ static void ToMeasure(void)
         // pid
         uint16_t tarTemp = GetTargetTemp(tarTempAdc);
         uint16_t sensorTemp = GetSensorTemp(sensorAdc);
-        SegDp_SetNumber(tarTemp);
-        PIDController_Update(&pid, tarTemp, sensorTemp);
-        ToHeat(pid.out);
+        if (sensorTemp >= 0xfff0)
+        { // todo error
+            CL_LOG_LINE("sensor error");
+            ToHeat(0);
+        }
+        else
+        {
+            SegDp_SetNumber(tarTemp);
+            PIDController_Update(&pid, tarTemp, sensorTemp);
+            ToHeat(pid.out);
+        }
         // CL_LOG_LINE("temp: %d, %d, pwm: %.2f", tarTemp, sensorTemp, pid.out);
         CL_LOG_LINE("%d\t%d\t%d\t%d\t%.2f", tarTempAdc, sensorAdc, tarTemp, sensorTemp, pid.out);
     }
