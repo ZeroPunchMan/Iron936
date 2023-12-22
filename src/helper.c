@@ -12,15 +12,16 @@ typedef struct
 static uint16_t TempInterpolate(const Adc2Temp_t *table, uint16_t tabLen, uint16_t adc)
 {
     if (adc < table[0].adc)
-        return 0xfffe;
+        return table[0].temp;
     else if (adc > table[tabLen - 1].adc)
-        return 0xffff;
+        return table[tabLen - 1].temp;
 
     for (uint16_t i = 0; i < tabLen - 1; i++)
     {
         if (VALUE_BETWEEN(adc, table[i].adc, table[i + 1].adc))
         {
             float result = ((float)adc - table[i].adc) / ((float)table[i + 1].adc - table[i].adc) * ((float)table[i + 1].temp - table[i].temp);
+            result += table[i].temp;
             return result;
         }
     }
@@ -32,18 +33,37 @@ static uint16_t TempInterpolate(const Adc2Temp_t *table, uint16_t tabLen, uint16
 
 uint16_t GetTargetTemp(uint16_t adc)
 {
+    static uint16_t tarTemp = 0;
+    uint16_t result;
     uint32_t r = TAR_ADC_TO_R(adc);
-    CL_LOG_LINE("r: %d", r);
+    // CL_LOG_LINE("r: %d", r);
     if (r > 10000)
-        return 120;
+    {
+        result = 120;
+    }
     else if (r < 5)
-        return 480;
+    {
+        result = 480;
+    }
     else
-        return 480 - r * (480.0f - 120) / 10000;
+    {
+        result = 480 - r * (480.0f - 120) / 10000;
+    }
+
+    if (result > (tarTemp + 5) || (result + 5) < tarTemp)
+        tarTemp = result;
+
+    uint16_t rem = tarTemp % 5;
+    if (rem >= 3)
+        tarTemp += 5 - rem;
+    else
+        tarTemp -= rem;
+
+    return tarTemp;
 }
 
 static const Adc2Temp_t sensorTempTable[] = {
-    {0, 0},      // todo 室温
+    {930, 15},   // 0% 室温
     {1450, 127}, // 3%
     {1580, 153}, // 5%
     {1870, 219}, // 10%

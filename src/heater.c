@@ -30,15 +30,15 @@ static WorkContext_t context = {
 };
 
 static PIDController pid = {
-    .Kp = 1.0f,
-    .Ki = 1.0f,
-    .Kd = 1.0f,
+    .Kp = 80.0f,
+    .Ki = 1.5f,
+    .Kd = 3.0f,
 
-    .limMinInt = -10.0f,
-    .limMaxInt = 10.0f,
+    .limMinInt = -300.0f,
+    .limMaxInt = 300.0f,
 
     .limMin = 0.0f,
-    .limMax = 100.0f,
+    .limMax = 1000.0f,
 
     .T = 0.1f,
 };
@@ -80,6 +80,8 @@ static void IdleProc(void)
 
 static void ToMeasure(void)
 {
+    SetPwmDuty(PwmChan_Heater, 0);
+    DelayOnSysTime(15);
     context.workSta = WS_Measure;
     uint16_t sensorAdc = 0;
     uint16_t tarTempAdc = 0;
@@ -88,7 +90,7 @@ static void ToMeasure(void)
         AdcConvert();
         sensorAdc += GetAdcResult(AdcChann_Heater);
         tarTempAdc += GetAdcResult(AdcChann_TargetTemp);
-        DelayOnSysTime(1);
+        // DelayOnSysTime(1);
     }
     sensorAdc /= 10;
     tarTempAdc /= 10;
@@ -98,17 +100,18 @@ static void ToMeasure(void)
     lastMeasureTime = GetSysTime();
     pid.T = span / 1000.0f;
 
-    CL_LOG_LINE("tar: %d, sensor: %d", tarTempAdc, sensorAdc);
+    // CL_LOG_LINE("tar: %d, sensor: %d", tarTempAdc, sensorAdc);
 
     if (context.onOff)
     {
         // pid
         uint16_t tarTemp = GetTargetTemp(tarTempAdc);
         uint16_t sensorTemp = GetSensorTemp(sensorAdc);
-        CL_LOG_LINE("temp: %d, %d", tarTemp, sensorTemp);
         SegDp_SetNumber(tarTemp);
         PIDController_Update(&pid, tarTemp, sensorTemp);
         ToHeat(pid.out);
+        // CL_LOG_LINE("temp: %d, %d, pwm: %.2f", tarTemp, sensorTemp, pid.out);
+        CL_LOG_LINE("%d\t%d\t%d\t%d\t%.2f", tarTempAdc, sensorAdc, tarTemp, sensorTemp, pid.out);
     }
     else
     {
@@ -119,8 +122,8 @@ static void ToMeasure(void)
 static void ToHeat(uint16_t pwmDuty)
 {
     context.workSta = WS_Heat;
-    // SetPwmDuty(PwmChan_Heater, pwmDuty);//todo
-    SetPwmDuty(PwmChan_Heater, 500);
+    SetPwmDuty(PwmChan_Heater, pwmDuty);
+    // SetPwmDuty(PwmChan_Heater, 300); //todo
     context.startHeatTime = GetSysTime();
 }
 

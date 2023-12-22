@@ -110,7 +110,7 @@ void SegDp_SetNumber(uint16_t num)
     disNumber[0] = (num % 1000) / 100;
     disNumber[1] = (num % 100) / 10;
     disNumber[2] = (num % 10);
-    CL_LOG_LINE("seg: %d, %d, %d", disNumber[2], disNumber[1], disNumber[0]);
+    // CL_LOG_LINE("seg: %d, %d, %d", disNumber[2], disNumber[1], disNumber[0]);
 }
 
 void SegDp_Init(void)
