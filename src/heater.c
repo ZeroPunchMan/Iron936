@@ -32,7 +32,7 @@ static WorkContext_t context = {
 static PIDController pid = {
     .Kp = 80.0f,
     .Ki = 1.5f,
-    .Kd = 3.0f,
+    .Kd = -1.0f,
 
     .limMinInt = -300.0f,
     .limMaxInt = 300.0f,
@@ -119,7 +119,7 @@ static void ToMeasure(void)
             ToHeat(pid.out);
         }
         // CL_LOG_LINE("temp: %d, %d, pwm: %.2f", tarTemp, sensorTemp, pid.out);
-        CL_LOG_LINE("%d\t%d\t%d\t%d\t%.2f", tarTempAdc, sensorAdc, tarTemp, sensorTemp, pid.out);
+        CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
     }
     else
     {
@@ -131,7 +131,7 @@ static void ToHeat(uint16_t pwmDuty)
 {
     context.workSta = WS_Heat;
     SetPwmDuty(PwmChan_Heater, pwmDuty);
-    // SetPwmDuty(PwmChan_Heater, 300); //todo
+    // SetPwmDuty(PwmChan_Heater, 650); //todo
     context.startHeatTime = GetSysTime();
 }
 

@@ -26,7 +26,7 @@ static uint16_t TempInterpolate(const Adc2Temp_t *table, uint16_t tabLen, uint16
         }
     }
 
-    return 0xfffd; //error
+    return 0xfffd; // error
 }
 
 #define TAR_ADC_TO_R(adc) (adc * 1000UL / (4096UL - adc))
@@ -47,7 +47,7 @@ uint16_t GetTargetTemp(uint16_t adc)
     }
     else
     {
-        result = 480 - r * (480.0f - 120) / 10000;
+        result = 480 - r * (480 - 120) / 10000;
     }
 
     if (result > (tarTemp + 5) || (result + 5) < tarTemp)
@@ -63,15 +63,15 @@ uint16_t GetTargetTemp(uint16_t adc)
 }
 
 static const Adc2Temp_t sensorTempTable[] = {
-    {930, 15},   // 0% 室温
-    {1450, 127}, // 3%
-    {1580, 153}, // 5%
-    {1870, 219}, // 10%
-    {2085, 268}, // 15%
-    {2257, 308}, // 20%
-    {2397, 343}, // 25%
-    {2524, 380}, // 32%
-    {2555, 420}, // 40%  到上限了????
+    {788, 17},   // 0% 室温
+    {1124, 115}, // 3%
+    {1380, 187}, // 8%
+    {1634, 257}, // 15%
+    {1860, 320}, // 24%
+    {2106, 385}, // 35%
+    {2298, 435}, // 48%
+    {2454, 478}, // 60%
+    {2500, 492}, // 65%
 };
 
 uint16_t GetSensorTemp(uint16_t adc)
