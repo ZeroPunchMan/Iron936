@@ -62,6 +62,31 @@ uint16_t GetTargetTemp(uint16_t adc)
     return tarTemp;
 }
 
+#define SLP_ADC_TO_R(adc) (adc * 1000UL / (4096UL - adc))
+uint8_t GetSleepDelay(uint16_t adc)
+{
+    static uint8_t sleep = 0;
+    uint8_t result;
+    uint32_t r = TAR_ADC_TO_R(adc);
+    if (r > 10000)
+    {
+        result = 2;
+    }
+    else if (r < 5)
+    {
+        result = 120;
+    }
+    else
+    {
+        result = 120 - r * (120 - 2) / 10000;
+    }
+
+    if (result >= (sleep + 2) || (result + 2) <= sleep)
+        sleep = result;
+
+    return sleep / 2;
+}
+
 static const Adc2Temp_t sensorTempTable[] = {
     {788, 17},   // 0% 室温
     {1124, 115}, // 3%

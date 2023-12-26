@@ -19,13 +19,9 @@ typedef enum
 } SegDpChar_t;
 
 void SegDp_Init(void);
+void SegDp_Process(void);
 
-void SegDp_SetNumber(uint16_t num);
-
-// void SegDp_SetChar(SegDpChar_t c);
-// void SegDp_SetDp(bool dp);
-
-// void SegDp_SetBitMask(uint8_t mask);
-
+void SegDp_SetSleepDelay(uint8_t delay);
+void SegDp_SetTarTemp(uint16_t temp);
 
 void SegDp_Update(void);

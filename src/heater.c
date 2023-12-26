@@ -21,12 +21,14 @@ typedef struct
     WorkStatus_t workSta;
     bool onOff;
     uint32_t startHeatTime;
+    uint8_t sleepDelay;
 } WorkContext_t;
 
 static WorkContext_t context = {
     .workSta = WS_Idle,
     .onOff = true,
     .startHeatTime = 0,
+    .sleepDelay = 0,
 };
 
 static PIDController pid = {
@@ -72,10 +74,7 @@ static void ToIdle(void)
 
 static void IdleProc(void)
 {
-    if (context.onOff)
-    {
-        ToMeasure();
-    }
+    ToMeasure();
 }
 
 static void ToMeasure(void)
@@ -85,15 +84,18 @@ static void ToMeasure(void)
     context.workSta = WS_Measure;
     uint16_t sensorAdc = 0;
     uint16_t tarTempAdc = 0;
+    uint16_t sleepAdc = 0;
     for (int i = 0; i < 10; i++)
     {
         AdcConvert();
         sensorAdc += GetAdcResult(AdcChann_Heater);
         tarTempAdc += GetAdcResult(AdcChann_TargetTemp);
+        sleepAdc += GetAdcResult(AdcChann_SleepDelay);
         // DelayOnSysTime(1);
     }
     sensorAdc /= 10;
     tarTempAdc /= 10;
+    sleepAdc /= 10;
 
     static uint32_t lastMeasureTime = 0;
     uint32_t span = SysTimeSpan(lastMeasureTime);
@@ -101,6 +103,13 @@ static void ToMeasure(void)
     pid.T = span / 1000.0f;
 
     // CL_LOG_LINE("tar: %d, sensor: %d", tarTempAdc, sensorAdc);
+
+    uint8_t sleep = GetSleepDelay(sleepAdc);
+    if (sleep != context.sleepDelay)
+    {
+        context.sleepDelay = sleep;
+        SegDp_SetSleepDelay(sleep);
+    }
 
     if (context.onOff)
     {
@@ -114,7 +123,7 @@ static void ToMeasure(void)
         }
         else
         {
-            SegDp_SetNumber(tarTemp);
+            SegDp_SetTarTemp(tarTemp);
             PIDController_Update(&pid, tarTemp, sensorTemp);
             ToHeat(pid.out);
         }
@@ -143,6 +152,18 @@ static void HeatProc(void)
     }
 }
 
+static inline bool HandleIdleCheck(void)
+{
+    static uint32_t lastTime = 0;
+    if (SysTimeSpan(lastTime) < 1000)
+        return false;
+    uint8_t pinLvl = GPIO_ReadInputDataBit(SLEEP_PORT, SLEEP_PIN);
+    CL_LOG_LINE("sleep pin: %d", pinLvl);
+    //todo 休眠识别
+    // context.sleepDelay * 60UL;
+    return false;
+}
+
 void Heater_Process(void)
 {
     switch (context.workSta)
@@ -156,4 +177,6 @@ void Heater_Process(void)
         HeatProc();
         break;
     }
+
+    HandleIdleCheck();
 }

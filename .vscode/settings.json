@@ -23,6 +23,7 @@
         "tim.h": "c",
         "board.h": "c",
         "helper.h": "c",
-        "cl_log.h": "c"
+        "cl_log.h": "c",
+        "ratio": "c"
     }
 }

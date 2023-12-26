@@ -1,6 +1,7 @@
 #include "seg_dp.h"
 #include "board.h"
 #include "cl_log.h"
+#include "systime.h"
 
 typedef struct
 {
@@ -104,15 +105,6 @@ void SegDp_SetChar(SegDpChar_t c)
 //     }
 // }
 
-static uint8_t disNumber[3] = {0};
-void SegDp_SetNumber(uint16_t num)
-{
-    disNumber[0] = (num % 1000) / 100;
-    disNumber[1] = (num % 100) / 10;
-    disNumber[2] = (num % 10);
-    // CL_LOG_LINE("seg: %d, %d, %d", disNumber[2], disNumber[1], disNumber[0]);
-}
-
 void SegDp_Init(void)
 {
 
@@ -139,10 +131,9 @@ void SegDp_Init(void)
         GPIO_ResetBits(segSelPins[i].port, segSelPins[i].pin);
     }
     GPIO_IOMUX_ChangePin(IOMUX_PIN11, IOMUX_PB5_SEL_PB5);
-
-    // SegDp_SetNumber(789);
 }
 
+static uint8_t disNumber[3] = {0};
 void SegDp_Update(void)
 {
     static uint8_t count = 0;
@@ -153,4 +144,34 @@ void SegDp_Update(void)
     SegDp_SetChar(SegDpChar_Off);
     SelectSeg(count);
     SegDp_SetChar((SegDpChar_t)disNumber[count]);
+}
+
+static uint32_t SetDelayTime = 0;
+static uint8_t sleepDelay = 1;
+static uint16_t targetTemp = 120;
+void SegDp_Process(void)
+{
+    if (SysTimeSpan(SetDelayTime) < 3000)
+    {
+        disNumber[0] = SegDpChar_Off;
+        disNumber[1] = (sleepDelay % 100) / 10;
+        disNumber[2] = (sleepDelay % 10);
+    }
+    else
+    {
+        disNumber[0] = (targetTemp % 1000) / 100;
+        disNumber[1] = (targetTemp % 100) / 10;
+        disNumber[2] = (targetTemp % 10);
+    }
+}
+
+void SegDp_SetSleepDelay(uint8_t delay)
+{
+    sleepDelay = delay;
+    SetDelayTime = GetSysTime();
+}
+
+void SegDp_SetTarTemp(uint16_t temp)
+{
+    targetTemp = temp;
 }
