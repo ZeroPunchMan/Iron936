@@ -76,15 +76,18 @@ static void ToIdle(void)
 
 static void IdleProc(void)
 {
-    if (context.onOff)
-        ToMeasure();
+    ToMeasure();
 }
 
 static void ToMeasure(void)
 {
+    context.workSta = WS_Measure;
+
+    //*****关PWM
     SetPwmDuty(PwmChan_Heater, 0);
     DelayOnSysTime(15);
-    context.workSta = WS_Measure;
+
+    //****测ADC
     uint16_t sensorAdc = 0;
     uint16_t tarTempAdc = 0;
     uint16_t sleepAdc = 0;
@@ -100,6 +103,7 @@ static void ToMeasure(void)
     tarTempAdc /= 10;
     sleepAdc /= 10;
 
+    //*****计算测量间隔
     static uint32_t lastMeasureTime = 0;
     uint32_t span = SysTimeSpan(lastMeasureTime);
     lastMeasureTime = GetSysTime();
@@ -107,6 +111,7 @@ static void ToMeasure(void)
 
     // CL_LOG_LINE("tar: %d, sensor: %d", tarTempAdc, sensorAdc);
 
+    //******计算休眠时间
     uint8_t sleep = GetSleepDelay(sleepAdc);
     if (sleep != context.sleepDelay)
     {
@@ -140,6 +145,7 @@ static void ToMeasure(void)
     else
     {
         ToIdle();
+        SegDp_SetTarTemp(0);
     }
 }
 
@@ -159,7 +165,7 @@ static void HeatProc(void)
     }
 }
 
-static inline bool HandleIdleCheck(void)
+static inline void HandleIdleCheck(void)
 {
     static uint32_t levelChangeTime = 0;
     static uint8_t lastLevel = 0;
@@ -170,10 +176,21 @@ static inline bool HandleIdleCheck(void)
 
     lastLevel = pinLvl;
 
-    if (SysTimeSpan(levelChangeTime) > (context.sleepDelay * SYSTIME_SECOND(60)))
-        return true;
-
-    return false;
+    if (SysTimeSpan(levelChangeTime) < (context.sleepDelay * SYSTIME_SECOND(60)))
+    {
+        context.onOff = true;
+        context.sleep = false;
+    }
+    else if (SysTimeSpan(levelChangeTime) < (context.sleepDelay * 2 * SYSTIME_SECOND(60)))
+    {
+        context.onOff = true;
+        context.sleep = true;
+    }
+    else
+    {
+        context.onOff = false;
+        context.sleep = false;
+    }
 }
 
 void Heater_Process(void)
@@ -190,11 +207,5 @@ void Heater_Process(void)
         break;
     }
 
-    bool sleep = HandleIdleCheck();
-
-    if (context.sleep != sleep)
-    {
-        CL_LOG_LINE("sleep: %d", sleep);
-        context.sleep = sleep;
-    }
+    HandleIdleCheck();
 }
