@@ -68,7 +68,7 @@ uint8_t GetSleepDelay(uint16_t adc)
     static uint8_t sleep = 0;
     uint8_t result;
     uint32_t r = TAR_ADC_TO_R(adc);
-    if (r > 10000)
+    if (r > 5000)
     {
         result = 2;
     }
@@ -78,7 +78,7 @@ uint8_t GetSleepDelay(uint16_t adc)
     }
     else
     {
-        result = 120 - r * (120 - 2) / 10000;
+        result = 120 - r * (120 - 2) / 5000;
     }
 
     if (result >= (sleep + 2) || (result + 2) <= sleep)

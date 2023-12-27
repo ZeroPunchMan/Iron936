@@ -22,6 +22,7 @@ typedef struct
     bool onOff;
     uint32_t startHeatTime;
     uint8_t sleepDelay;
+    bool sleep;
 } WorkContext_t;
 
 static WorkContext_t context = {
@@ -29,6 +30,7 @@ static WorkContext_t context = {
     .onOff = true,
     .startHeatTime = 0,
     .sleepDelay = 0,
+    .sleep = false,
 };
 
 static PIDController pid = {
@@ -52,7 +54,7 @@ void Heater_Init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
@@ -74,7 +76,8 @@ static void ToIdle(void)
 
 static void IdleProc(void)
 {
-    ToMeasure();
+    if (context.onOff)
+        ToMeasure();
 }
 
 static void ToMeasure(void)
@@ -109,13 +112,18 @@ static void ToMeasure(void)
     {
         context.sleepDelay = sleep;
         SegDp_SetSleepDelay(sleep);
+        CL_LOG_LINE("sleep delay: %d", context.sleepDelay);
     }
 
     if (context.onOff)
     {
-        // pid
-        uint16_t tarTemp = GetTargetTemp(tarTempAdc);
+        // 传感器温度
         uint16_t sensorTemp = GetSensorTemp(sensorAdc);
+        // 目标温度
+        uint16_t tarTemp = 200;
+        if (!context.sleep)
+            tarTemp = GetTargetTemp(tarTempAdc);
+
         if (sensorTemp >= 0xfff0)
         { // todo error
             CL_LOG_LINE("sensor error");
@@ -127,8 +135,7 @@ static void ToMeasure(void)
             PIDController_Update(&pid, tarTemp, sensorTemp);
             ToHeat(pid.out);
         }
-        // CL_LOG_LINE("temp: %d, %d, pwm: %.2f", tarTemp, sensorTemp, pid.out);
-        CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
+        // CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
     }
     else
     {
@@ -139,8 +146,8 @@ static void ToMeasure(void)
 static void ToHeat(uint16_t pwmDuty)
 {
     context.workSta = WS_Heat;
-    SetPwmDuty(PwmChan_Heater, pwmDuty);
-    // SetPwmDuty(PwmChan_Heater, 650); //todo
+    // SetPwmDuty(PwmChan_Heater, pwmDuty);
+    SetPwmDuty(PwmChan_Heater, 0); // todo
     context.startHeatTime = GetSysTime();
 }
 
@@ -154,13 +161,18 @@ static void HeatProc(void)
 
 static inline bool HandleIdleCheck(void)
 {
-    static uint32_t lastTime = 0;
-    if (SysTimeSpan(lastTime) < 1000)
-        return false;
+    static uint32_t levelChangeTime = 0;
+    static uint8_t lastLevel = 0;
     uint8_t pinLvl = GPIO_ReadInputDataBit(SLEEP_PORT, SLEEP_PIN);
-    CL_LOG_LINE("sleep pin: %d", pinLvl);
-    //todo 休眠识别
-    // context.sleepDelay * 60UL;
+
+    if (pinLvl != lastLevel)
+        levelChangeTime = GetSysTime();
+
+    lastLevel = pinLvl;
+
+    if (SysTimeSpan(levelChangeTime) > (context.sleepDelay * SYSTIME_SECOND(60)))
+        return true;
+
     return false;
 }
 
@@ -178,5 +190,11 @@ void Heater_Process(void)
         break;
     }
 
-    HandleIdleCheck();
+    bool sleep = HandleIdleCheck();
+
+    if (context.sleep != sleep)
+    {
+        CL_LOG_LINE("sleep: %d", sleep);
+        context.sleep = sleep;
+    }
 }

@@ -168,7 +168,16 @@ void SegDp_Process(void)
 void SegDp_SetSleepDelay(uint8_t delay)
 {
     sleepDelay = delay;
-    SetDelayTime = GetSysTime();
+
+    static bool firstTime = true;
+    if (!firstTime)
+    {
+        SetDelayTime = GetSysTime();
+    }
+    else
+    {
+        firstTime = false;
+    }
 }
 
 void SegDp_SetTarTemp(uint16_t temp)
