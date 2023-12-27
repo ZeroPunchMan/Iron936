@@ -146,8 +146,8 @@ static void ToMeasure(void)
 static void ToHeat(uint16_t pwmDuty)
 {
     context.workSta = WS_Heat;
-    // SetPwmDuty(PwmChan_Heater, pwmDuty);
-    SetPwmDuty(PwmChan_Heater, 0); // todo
+    SetPwmDuty(PwmChan_Heater, pwmDuty);
+    // SetPwmDuty(PwmChan_Heater, 0); // todo
     context.startHeatTime = GetSysTime();
 }
 
