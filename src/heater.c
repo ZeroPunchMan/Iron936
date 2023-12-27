@@ -11,7 +11,6 @@
 
 typedef enum
 {
-    WS_Idle,
     WS_Measure,
     WS_Heat,
 } WorkStatus_t;
@@ -19,18 +18,16 @@ typedef enum
 typedef struct
 {
     WorkStatus_t workSta;
-    bool onOff;
     uint32_t startHeatTime;
     uint8_t sleepDelay;
-    bool sleep;
+    uint32_t lastActionTime;
 } WorkContext_t;
 
 static WorkContext_t context = {
-    .workSta = WS_Idle,
-    .onOff = true,
+    .workSta = WS_Measure,
     .startHeatTime = 0,
     .sleepDelay = 0,
-    .sleep = false,
+    .lastActionTime = 0,
 };
 
 static PIDController pid = {
@@ -66,17 +63,6 @@ void Heater_Init(void)
     GPIO_IOMUX_ChangePin(IOMUX_PIN11, IOMUX_PD5_SEL_PD5);
 
     PIDController_Init(&pid);
-}
-
-static void ToIdle(void)
-{
-    context.workSta = WS_Idle;
-    SetPwmDuty(PwmChan_Heater, 0);
-}
-
-static void IdleProc(void)
-{
-    ToMeasure();
 }
 
 static void ToMeasure(void)
@@ -120,23 +106,34 @@ static void ToMeasure(void)
         CL_LOG_LINE("sleep delay: %d", context.sleepDelay);
     }
 
-    if (context.onOff)
+    // 目标温度
+    uint16_t tarTemp = 200;
+
+    if (SysTimeSpan(context.lastActionTime) < (context.sleepDelay * SYSTIME_SECOND(60)))
+    {
+        tarTemp = GetTargetTemp(tarTempAdc);
+    }
+    else if (SysTimeSpan(context.lastActionTime) < (context.sleepDelay * 2 * SYSTIME_SECOND(60)))
+    {
+        tarTemp = 200;
+    }
+    else
+    {
+        tarTemp = 0;
+    }
+
+    SegDp_SetTarTemp(tarTemp);
+    if (tarTemp > 0)
     {
         // 传感器温度
         uint16_t sensorTemp = GetSensorTemp(sensorAdc);
-        // 目标温度
-        uint16_t tarTemp = 200;
-        if (!context.sleep)
-            tarTemp = GetTargetTemp(tarTempAdc);
-
         if (sensorTemp >= 0xfff0)
-        { // todo error
+        { // error
             CL_LOG_LINE("sensor error");
             ToHeat(0);
         }
         else
         {
-            SegDp_SetTarTemp(tarTemp);
             PIDController_Update(&pid, tarTemp, sensorTemp);
             ToHeat(pid.out);
         }
@@ -144,8 +141,7 @@ static void ToMeasure(void)
     }
     else
     {
-        ToIdle();
-        SegDp_SetTarTemp(0);
+        ToHeat(0);
     }
 }
 
@@ -167,39 +163,21 @@ static void HeatProc(void)
 
 static inline void HandleIdleCheck(void)
 {
-    static uint32_t levelChangeTime = 0;
     static uint8_t lastLevel = 0;
     uint8_t pinLvl = GPIO_ReadInputDataBit(SLEEP_PORT, SLEEP_PIN);
 
     if (pinLvl != lastLevel)
-        levelChangeTime = GetSysTime();
+    {
+        context.lastActionTime = GetSysTime();
+    }
 
     lastLevel = pinLvl;
-
-    if (SysTimeSpan(levelChangeTime) < (context.sleepDelay * SYSTIME_SECOND(60)))
-    {
-        context.onOff = true;
-        context.sleep = false;
-    }
-    else if (SysTimeSpan(levelChangeTime) < (context.sleepDelay * 2 * SYSTIME_SECOND(60)))
-    {
-        context.onOff = true;
-        context.sleep = true;
-    }
-    else
-    {
-        context.onOff = false;
-        context.sleep = false;
-    }
 }
 
 void Heater_Process(void)
 {
     switch (context.workSta)
     {
-    case WS_Idle:
-        IdleProc();
-        break;
     case WS_Measure:
         break;
     case WS_Heat:
