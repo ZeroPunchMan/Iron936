@@ -21,6 +21,7 @@ typedef struct
     uint32_t startHeatTime;
     uint8_t sleepDelay;
     uint32_t lastActionTime;
+    uint16_t targetTemp;
 } WorkContext_t;
 
 static WorkContext_t context = {
@@ -28,6 +29,7 @@ static WorkContext_t context = {
     .startHeatTime = 0,
     .sleepDelay = 0,
     .lastActionTime = 0,
+    .targetTemp = 200,
 };
 
 static PIDController pid = {
@@ -63,6 +65,7 @@ void Heater_Init(void)
     GPIO_IOMUX_ChangePin(IOMUX_PIN11, IOMUX_PD5_SEL_PD5);
 
     PIDController_Init(&pid);
+    ToHeat(0);
 }
 
 static void ToMeasure(void)
@@ -107,15 +110,19 @@ static void ToMeasure(void)
     }
 
     // 目标温度
-    uint16_t tarTemp = 200;
+    uint16_t tarTemp = GetTargetTemp(tarTempAdc);
+    if (tarTemp != context.targetTemp)
+    {
+        context.targetTemp = tarTemp;
+        context.lastActionTime = GetSysTime();
+    }
 
     if (SysTimeSpan(context.lastActionTime) < (context.sleepDelay * SYSTIME_SECOND(60)))
     {
-        tarTemp = GetTargetTemp(tarTempAdc);
     }
     else if (SysTimeSpan(context.lastActionTime) < (context.sleepDelay * 2 * SYSTIME_SECOND(60)))
     {
-        tarTemp = 200;
+        tarTemp = 120;
     }
     else
     {
@@ -137,11 +144,12 @@ static void ToMeasure(void)
             PIDController_Update(&pid, tarTemp, sensorTemp);
             ToHeat(pid.out);
         }
-        // CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
+        CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
     }
     else
     {
         ToHeat(0);
+        CL_LOG_LINE("target: %d", tarTemp);
     }
 }
 

@@ -50,14 +50,16 @@ uint16_t GetTargetTemp(uint16_t adc)
         result = 480 - r * (480 - 120) / 10000;
     }
 
-    if (result > (tarTemp + 5) || (result + 5) < tarTemp)
+    if (result >= (tarTemp + 5) || (result + 5) <= tarTemp)
         tarTemp = result;
 
     uint16_t rem = tarTemp % 5;
     if (rem >= 3)
-        return (tarTemp + (5 - rem));
+        tarTemp += 5 - rem;
     else
-        return tarTemp - rem;
+        tarTemp -= rem;
+
+    return tarTemp;
 }
 
 #define SLP_ADC_TO_R(adc) (adc * 1000UL / (4096UL - adc))
