@@ -76,6 +76,7 @@ static void ToMeasure(void)
 
     //*****关PWM
     SetPwmDuty(PwmChan_Heater, 0);
+
     DelayOnSysTime(15);
 
     //****测ADC
@@ -148,13 +149,15 @@ static void ToMeasure(void)
             {
                 uint16_t out = pid.out;
                 ToHeat(CL_MIN(out, PRT_PWM));
+                CL_LOG_LINE("limit: %d\t%d\t%d", tarTemp, sensorTemp, CL_MIN(out, PRT_PWM));
             }
             else
             {
                 ToHeat(pid.out);
+                CL_LOG_LINE("full: %d\t%d\t%d", tarTemp, sensorTemp, (int)pid.out);
             }
         }
-        CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
+        // CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
     }
     else
     {
@@ -205,6 +208,10 @@ void Heater_Process(void)
 
     HandleIdleCheck();
 
-    if (GetAdcResult(AdcChann_Voltage) < PRT_ADC) // 检测电压,是否限制电流
-        context.limitCurrent = true;
+    
+    if (GetSysTime() > SYSTIME_SECOND(1))
+    {
+        if (GetAdcResult(AdcChann_Voltage) < PRT_ADC) // 检测电压,是否限制电流
+            context.limitCurrent = true;
+    }
 }
