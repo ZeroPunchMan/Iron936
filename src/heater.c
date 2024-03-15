@@ -142,9 +142,21 @@ static void ToMeasure(void)
         else
         {
             PIDController_Update(&pid, tarTemp, sensorTemp);
-            ToHeat(pid.out);
+
+            if (GetAdcResult(AdcChann_Voltage) < 2750) // 检测电压,是否限制电流
+            {
+                uint16_t out = pid.out;
+                out = CL_MIN(out, 150);
+                ToHeat(out);
+                CL_LOG_LINE("half: %d\t%d\t%d", tarTemp, sensorTemp, out);
+            }
+            else
+            {
+                ToHeat(pid.out);
+                CL_LOG_LINE("full: %d\t%d\t%d", tarTemp, sensorTemp, (int)pid.out);
+            }
+            // CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
         }
-        // CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
     }
     else
     {

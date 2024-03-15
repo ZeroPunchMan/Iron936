@@ -27,7 +27,9 @@ int main(void)
     SysTick_Config(32000);
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA | RCC_AHBPeriph_GPIOB | RCC_AHBPeriph_GPIOC | RCC_AHBPeriph_GPIOD, ENABLE);
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_IOMUX, ENABLE);
+#if defined(USE_LDB_LOG)
     USART_Config();
+#endif
     ADC_Config();
     TIM_Config();
     SegDp_Init();
@@ -42,7 +44,7 @@ int main(void)
             // CL_LOG_LINE("%ds", GetSysTime() / 1000);
 
             // AdcConvert();
-            CL_LOG_LINE("adc: %d, %d, %d, %d", GetAdcResult(AdcChann_Heater), GetAdcResult(AdcChann_SleepDelay), GetAdcResult(AdcChann_TargetTemp), GetAdcResult(AdcChann_Voltage));
+            // CL_LOG_LINE("adc: %d, %d, %d, %d", GetAdcResult(AdcChann_Heater), GetAdcResult(AdcChann_SleepDelay), GetAdcResult(AdcChann_TargetTemp), GetAdcResult(AdcChann_Voltage));
         }
         Heater_Process();
         SegDp_Process();

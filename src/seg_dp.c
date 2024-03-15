@@ -146,12 +146,12 @@ void SegDp_Update(void)
     SegDp_SetChar((SegDpChar_t)disNumber[count]);
 }
 
-static uint32_t SetDelayTime = 0;
+static uint32_t setDelayTime = 0;
 static uint8_t sleepDelay = 1;
 static uint16_t targetTemp = 120;
 void SegDp_Process(void)
 {
-    if (SysTimeSpan(SetDelayTime) < 3000)
+    if (SysTimeSpan(setDelayTime) < 3000 && setDelayTime != 0)
     {
         disNumber[0] = SegDpChar_Off;
         disNumber[1] = (sleepDelay % 100) / 10;
@@ -172,7 +172,7 @@ void SegDp_SetSleepDelay(uint8_t delay)
     static bool firstTime = true;
     if (!firstTime)
     {
-        SetDelayTime = GetSysTime();
+        setDelayTime = GetSysTime();
     }
     else
     {
