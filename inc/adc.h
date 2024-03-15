@@ -8,6 +8,7 @@ typedef enum
     AdcChann_Heater = 0,
     AdcChann_SleepDelay,
     AdcChann_TargetTemp,
+    AdcChann_Voltage,
     AdcChann_Max,
 } AdcChannel_t;
 

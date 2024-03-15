@@ -123,6 +123,7 @@ void USART1_IRQHandler(void)
     }
 }
 
+extern __IO uint16_t ADC_Channel1_ConvertedValue;
 extern __IO uint16_t ADC_Channel2_ConvertedValue;
 extern __IO uint16_t ADC_Channel3_ConvertedValue;
 extern __IO uint16_t ADC_Channel4_ConvertedValue;
@@ -139,15 +140,17 @@ void ADC1_IRQHandler(void)
         ADC_ClearITPendingBit(ADC1, ADC_IT_EOC);
         if (count == 0)
         {
+            ADC_Channel1_ConvertedValue = ADC_GetConversionValue(ADC1);
+        }
+        else if (count == 1)
+        {
             ADC_Channel2_ConvertedValue = ADC_GetConversionValue(ADC1);
         }
-
-        if (count == 1)
+        else if (count == 2)
         {
             ADC_Channel3_ConvertedValue = ADC_GetConversionValue(ADC1);
         }
-
-        if (count == 2)
+        else if (count == 3)
         {
             ADC_Channel4_ConvertedValue = ADC_GetConversionValue(ADC1);
         }

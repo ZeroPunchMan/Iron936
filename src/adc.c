@@ -5,6 +5,7 @@
 #include "usart.h"
 #include "adc.h"
 
+__IO uint16_t ADC_Channel1_ConvertedValue;
 __IO uint16_t ADC_Channel2_ConvertedValue;
 __IO uint16_t ADC_Channel3_ConvertedValue;
 __IO uint16_t ADC_Channel4_ConvertedValue;
@@ -36,6 +37,9 @@ void ADC_Config(void)
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
     GPIO_Init(GPIOD, &GPIO_InitStructure);
 
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+    GPIO_Init(GPIOD, &GPIO_InitStructure);
+
     NVIC_InitStructure.NVIC_IRQChannel = ADC1_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPriority = 1;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -61,7 +65,7 @@ void ADC_Config(void)
     ADC_ITConfig(ADC1, ADC_IT_EOSEQ, ENABLE);
 
     /* Convert the ADC1 Channel2, Channel3 and Channel4 with 239.5 Cycles as sampling time */
-    ADC_ChannelConfig(ADC1, ADC_Channel_2 | ADC_Channel_3 | ADC_Channel_4, ADC_SampleTime_239_5Cycles);
+    ADC_ChannelConfig(ADC1, ADC_Channel_1 | ADC_Channel_2 | ADC_Channel_3 | ADC_Channel_4, ADC_SampleTime_239_5Cycles);
 
     /* ADC1 Calibration */
     ADC_GetCalibrationFactor(ADC1);
@@ -93,6 +97,8 @@ uint16_t GetAdcResult(AdcChannel_t channel)
         return ADC_Channel4_ConvertedValue;
     case AdcChann_TargetTemp:
         return ADC_Channel3_ConvertedValue;
+    case AdcChann_Voltage:
+        return ADC_Channel1_ConvertedValue;
     }
     return 0;
 }

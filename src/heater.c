@@ -144,7 +144,7 @@ static void ToMeasure(void)
             PIDController_Update(&pid, tarTemp, sensorTemp);
             ToHeat(pid.out);
         }
-        CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
+        // CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
     }
     else
     {
