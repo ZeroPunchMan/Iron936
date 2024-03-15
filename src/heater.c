@@ -22,6 +22,7 @@ typedef struct
     uint8_t sleepDelay;
     uint32_t lastActionTime;
     uint16_t targetTemp;
+    bool limitCurrent;
 } WorkContext_t;
 
 static WorkContext_t context = {
@@ -30,6 +31,7 @@ static WorkContext_t context = {
     .sleepDelay = 0,
     .lastActionTime = 0,
     .targetTemp = 200,
+    .limitCurrent = false,
 };
 
 static PIDController pid = {
@@ -142,21 +144,17 @@ static void ToMeasure(void)
         else
         {
             PIDController_Update(&pid, tarTemp, sensorTemp);
-
-            if (GetAdcResult(AdcChann_Voltage) < 2750) // 检测电压,是否限制电流
+            if (context.limitCurrent)
             {
                 uint16_t out = pid.out;
-                out = CL_MIN(out, 150);
-                ToHeat(out);
-                CL_LOG_LINE("half: %d\t%d\t%d", tarTemp, sensorTemp, out);
+                ToHeat(CL_MIN(out, PRT_PWM));
             }
             else
             {
                 ToHeat(pid.out);
-                CL_LOG_LINE("full: %d\t%d\t%d", tarTemp, sensorTemp, (int)pid.out);
             }
-            // CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
         }
+        CL_LOG_LINE("%d\t%d\t%d\t%d\t%d", tarTempAdc, sensorAdc, tarTemp, sensorTemp, (int)pid.out);
     }
     else
     {
@@ -206,4 +204,7 @@ void Heater_Process(void)
     }
 
     HandleIdleCheck();
+
+    if (GetAdcResult(AdcChann_Voltage) < PRT_ADC) // 检测电压,是否限制电流
+        context.limitCurrent = true;
 }

@@ -15,8 +15,8 @@
 #define SEG_C_PORT (GPIOD)
 #define SEG_C_PIN (GPIO_Pin_4)
 
-#define SEG_B_PORT (GPIOD)
-#define SEG_B_PIN (GPIO_Pin_4) //todo
+#define SEG_B_PORT (GPIOA)
+#define SEG_B_PIN (GPIO_Pin_3)
 
 #define SEG_A_PORT (GPIOB)
 #define SEG_A_PIN (GPIO_Pin_4)
