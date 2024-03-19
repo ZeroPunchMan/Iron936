@@ -184,15 +184,27 @@ static void HeatProc(void)
 
 static inline void HandleIdleCheck(void)
 {
-    static uint8_t lastLevel = 0;
-    uint8_t pinLvl = GPIO_ReadInputDataBit(SLEEP_PORT, SLEEP_PIN);
+    static uint32_t lastSecTime = 0;
+    static uint16_t lvlCount = 0;
 
-    if (pinLvl != lastLevel)
+    if (SysTimeSpan(lastSecTime) < 1000)
     {
-        context.lastActionTime = GetSysTime();
-    }
+        static uint8_t lastLevel = 0;
+        uint8_t pinLvl = GPIO_ReadInputDataBit(SLEEP_PORT, SLEEP_PIN);
+        if (pinLvl != lastLevel)
+            lvlCount++;
 
-    lastLevel = pinLvl;
+        lastLevel = pinLvl;
+    }
+    else
+    {
+        lastSecTime = GetSysTime();
+
+        if (lvlCount >= 4)
+            context.lastActionTime = GetSysTime();
+
+        lvlCount = 0;
+    }
 }
 
 void Heater_Process(void)
@@ -208,7 +220,6 @@ void Heater_Process(void)
 
     HandleIdleCheck();
 
-    
     if (GetSysTime() > SYSTIME_SECOND(1))
     {
         if (GetAdcResult(AdcChann_Voltage) < PRT_ADC) // 检测电压,是否限制电流
