@@ -23,6 +23,7 @@ typedef struct
     uint32_t lastActionTime;
     uint16_t targetTemp;
     bool limitCurrent;
+    uint32_t limitTime;
 } WorkContext_t;
 
 static WorkContext_t context = {
@@ -223,6 +224,14 @@ void Heater_Process(void)
     if (GetSysTime() > SYSTIME_SECOND(1))
     {
         if (GetAdcResult(AdcChann_Voltage) < PRT_ADC) // 检测电压,是否限制电流
+        {
             context.limitCurrent = true;
+            context.limitTime = GetSysTime();
+        }
+
+        if(context.limitCurrent && SysTimeSpan(context.limitTime) > SYSTIME_SECOND(60))
+        {
+            context.limitCurrent = false;
+        }
     }
 }
